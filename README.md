@@ -1,1 +1,1 @@
-# Covud-Lockdown-Mental-Data-Analysis
+# Covid-Lockdown-Mental-Data-Analysis
