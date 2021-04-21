@@ -28,13 +28,44 @@
 &emsp;&emsp;PHQ-ADS指在评估时同时使用PHQ-9和GAD-7量表，广泛用于评估短期焦虑抑郁症状，为初步临床心理诊断提供参考。其中PHQ-9为患者健康问卷9项抑郁量表(Patient Health Questionnaire 9)，GAD-7则为7项广泛性焦虑症量表(Generalized Anxiety Disorder 7),是全球使用最广泛的抑郁和焦虑评估方法，共被翻译成100多种语言版本。<br>
 &emsp;&emsp;PHQ-ADS共有16个问题(具体见附录A)，每个问题有四个选项，按程度依次记为0-3分，分值区间为0至48分。以分值10、20、30作为轻度、中度和重度焦虑抑郁障碍的评判阈值，可以由此判断测试者近期心理健康与躯体症状。Kroenke等人证明PHQ-ADS方法在临床实践中具有良好的灵敏度和准确率[6]，能够快速有效地区分患者焦虑抑郁程度。<br>
 
+# 2	前期数据处理
+## 2.1	数据基本描述
+&emsp;&emsp;本次建模采用的原始数据来自2020年5月波兰进行的新冠疫情封锁有关心理学调查[7]，以PHQ-ADS标准综合评估测试者精神心理健康状态。该调查数据收集了1115个有效样本，每个样本对应包含了基本个人信息、PHQ-9与GAD-7量表详细得分与总分、疫情困难与社会支持量表对应得分(分别为16项和5项)、Covid-19可感知风险量表详细得分(6项)、个人健康问卷、经济情况等。具体的量表问题和数据说明可见于文末的附录A。<br>
 
+## 2.2	数据缺失值处理
+&emsp;&emsp;本研究采用的数据已经经过了初步筛选处理，并去除了离群数据。而对于问卷数据来说，研究者往往要关注的是数据的缺失情况及对应的处理方法。下表是原始数据中各变量的数据缺失数目。<br>
+表 1 数据缺失情况
+|&nbsp;|index|missNum|&nbsp;|index|missNum|
+|0|Id|0|28|Phq9_2|0|
+|1|Sex|0|29|Phq9_3|0|
+|2|Age|0|30|Phq9_4|0|
+|3|AgeGroup|0|31|Phq9_5|0|
+|4|Education|0|32|Phq9_6|0|
+|5|FinancialSituation_General|0|33|Phq9_7|0|
+|6|FinancialSituation_Pandemic|0|34|Phq9_8|0|
+|7|IncomeContinuity|391|35|Phq9_9|0|
+|8|HealthStatus|0|36|Gad7_1|0|
+|9|Unemployed|0|37|Gad7_2|0|
+|10|Student|0|38|Gad7_3|0|
+|11|Pandemic_Difficulties_1|0|39|Gad7_4|0|
+|12|Pandemic_Difficulties_2|0|40|Gad7_5|0|
+|13|Pandemic_Difficulties_3|0|41|Gad7_6|0|
+|14|Pandemic_Difficulties_4|0|42|Gad7_7|0|
+|15|Pandemic_Difficulties_5|0|43|Covid19_risk_1|0|
+|16|Pandemic_Difficulties_6|0|44|Covid19_risk_2|0|
+|17|Pandemic_Difficulties_7|0|45|Covid19_risk_3|0|
+|18|Pandemic_Difficulties_8|0|46|Covid19_risk_4|0|
+|19|Pandemic_Difficulties_9|0|47|Covid19_risk_5|0|
+|20|Pandemic_Difficulties_10|0|48|Covid19_risk_6|0|
+|21|Pandemic_Difficulties_11|0|49|SocialSupport_1|0|
+|22|Pandemic_Difficulties_12|0|50|SocialSupport_2|0|
+|23|Pandemic_Difficulties_13|0|51|SocialSupport_3|0|
+|24|Pandemic_Difficulties_14|0|52|SocialSupport_4|0|
+|25|Pandemic_Difficulties_15|0|53|SocialSupport_5|0|
+|26|Pandemic_Difficulties_16|0|54|PHQ9_sum|0|
+|27|Phq9_1|0|55|GAD7_sum|0|
 
-
-
-
-
-
+&emsp;&emsp;表 1说明了实验数据的质量和完整性良好，总共包含有55个变量，且只有变量IncomeContinuity存在391个缺失值。变量IncomeContinuity代表的是收入连续性，该数据缺失意味着参与测试者可能无法确定自己当前或者是之后的收入能否连续，表明的对疫情封锁期间的经济状况的不确定。通过查看数据后我们发现，在变量IncomeContinuity存在缺失的样本里面对应Unemployed变量值均为0，即未失业。而根据实际情况，大部分未失业者大多数都能够获得基本薪酬，只是相较于疫情前可能有所减少。另一方面，含缺失值的样本数接近于原始数据样本的1/3，直接去除会减少相当一部分的数据量，因此本课题决定通过填补的方式修复缺失数据，将缺失值填充为1，以便后续建模。<br>
 
 
 
