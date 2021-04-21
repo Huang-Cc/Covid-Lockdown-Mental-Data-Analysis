@@ -3,9 +3,9 @@
 
 ### 施工中(50%)
 
-- [Covid-Lockdown-Mental-Data-Analysis](# Covid-Lockdown-Mental-Data-Analysis)
-  * [1	引言](# 1	引言)
-  * [1.1	研究背景及意义](# 1.1	研究背景及意义)
+- [Covid-Lockdown-Mental-Data-Analysis](#Covid-Lockdown-Mental-Data-Analysis)
+  * [1	引言](#1-引言)
+  * [1.1	研究背景及意义](#1.1-研究背景及意义)
 
 # 1	引言
 ## 1.1	研究背景及意义
