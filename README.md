@@ -128,7 +128,7 @@
 ## 3.1	决策树
 &emsp;&emsp;决策树算法的主要参数有特征选取方法criterion、树的最大深度max_depth、节点再划分最小样本数min_samples_split、叶子节点最小样本数min_samples_leaf等。其中criterion可以选择gini(基尼不纯度)和entropy(信息增益)。本课题在该参数上选用的是基尼不纯度，其计算方法如下公式(1)，criterion=gini对应的决策树算法为CART算法。<br>
 
-![image](https://latex.codecogs.com/svg.image?I_%7Bg%7D(p)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D%5Csum_%7Bk%5Cneq%20i%7Dp_%7Bk%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D(1-p_%7Bi%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D-p_%7Bi%7D%5E2)=1-%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D%5E2)   (1)
+![image](https://latex.codecogs.com/svg.image?I_%7Bg%7D(p)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D%5Csum_%7Bk%5Cneq%20i%7Dp_%7Bk%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D(1-p_%7Bi%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D-p_%7Bi%7D%5E2)=1-%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D%5E2)   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;(1)
 
 &emsp;&emsp;其中J为类别个数，i∈{1,2,…,J}，p_i为第i类标签在数据集中的占比。<br>
 &emsp;&emsp;另外对该算法设置了参数max_features=sqrt，对变量min_samples_split, max_depth进行1网格搜索，搜索范围为2-30和1-20，步长均为1。<br>
@@ -156,12 +156,12 @@
 &emsp;&emsp;支持向量机的超参数随核函数的变化而相应不同，常用的有线性核函数Linear，对应超参数为C；高斯核函数rbf，对应超参数C和gamma；多项式核函数poly，对应超参数为C、gamma和degree；以及Sigmoid核函数，常用超参数与rbf相同。<br>
 &emsp;&emsp;按SVM分类器建模常用流程，先选择合适的核函数，再调整对应超参数。对kernel参数备选组(poly,rbf,linear,sigmoid)进行10折网格搜索，其中性能最好的核函数为多项式核函数poly，默认参数下测试集F1_micro得分为0.7403，其分类效果明显优于决策树，也好于上述KNN算法。<br>
 
-![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svn2.png)
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svc2.png)
 > 图 5 多项式核SVM分类器参数C选择过程
 
 &emsp;&emsp;对超参数C在\[\1,100)步长为1的范围进行搜索验证，当C=1(即默认值)时模型得分最优，模型测试集得分为0.7403，与第一步结果相同，接着搜索超参数degree的取值。<br>
 
-![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svn3.png)
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svc3.png)
 > 图 6 多项式核SVM分类器参数degree选择过程
 
 &emsp;&emsp;从图 6可以看到，在degree=3时模型F1_score得分出现峰值，输入测试集得到测试得分为0.7403，与第一步模型得分相同，原因是超参数degree的默认值为3。<br>
@@ -191,7 +191,7 @@
 
 &emsp;&emsp;GridSearchCV最终选择选择了max_features=3，模型得分依旧没有发生改变，原因是前面建模是选择的max_features=auto，算法会根据经验默认为其填充特征数开方的取整值，即<br>
 
-![image](https://latex.codecogs.com/svg.image?int(%5Csqrt%5B2%5D%7Bn%5C_%7B%7Dfeature%7D)=int(%5Csqrt%5B2%5D%7B14%7D)=3) (2)
+![image](https://latex.codecogs.com/svg.image?int(%5Csqrt%5B2%5D%7Bn%5C_%7B%7Dfeature%7D)=int(%5Csqrt%5B2%5D%7B14%7D)=3) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;(2)
 
 &emsp;&emsp;至此，本研究建立了一个性能较为优异的随机森林，最后再来看看Xgboost的表现。<br>
 
@@ -201,8 +201,9 @@
 &emsp;&emsp;和随机森林一样，模型的超参数过多，不能确保组合起来遍历搜索，所以采用相同的贪心算法来分组网格交叉验证调参。表 4为初始模型参数。<br>
 
 > 表 4 Xgboost初步建模输入默认参数
+
 |parameter|value|
-|:---:|:---:|
+|:----:|:----:|
 |learning_rate|0.1|
 |subsample|1|
 |max_depth|6|
@@ -213,7 +214,7 @@
 &emsp;&emsp;本次建模将首先从n_estimators开始，寻找最佳的迭代次数。<br>
 &emsp;&emsp;由图 11可以发现模型得分先是快速上升到一个极点，而后下降至波动平稳。极值点的n_estimators为33，测试集得分为0.6985，似乎得分并不是特别理想，接下来调整进一步超参数组合min_child_weight和max_depth，观察其对应模型得分变化。<br>
 
-![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb.png)
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb1.png)
 > 图 11 Xgboost参数n_estimators与模型F1_micro得分的关系
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb2.png)
 > 图 12 用Xgboost模型F1_micro得分筛选参数组(min_child_weight,max_depth)
@@ -244,7 +245,7 @@
 ## 3.6	特征重要性
 &emsp;&emsp;由于Xgboost是基于树模型的集成学习算法，能够自发地在学习过程中进行特征选择，从而精简了部分数据预处理操作。并且，它与其他树类算法一样能够在学习的过程中计算的特征重要性。<br>
 
-![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/img.png)
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/imp.png)
 > 图 17  Xgboost特征重要性可视化
 
 &emsp;&emsp;图 17绘制了Xgboost模型中每个特征对分类的贡献程度。贡献最大的前五名依次是Social_Restrictions、Protection_and_Life_Change、Worry_and_Fear、Unemployed和AgeGroup，可见疫情期间不同年龄组、社交隔离、失业风险和生活剧变等对民众心理健康有显著影响。<br>
@@ -253,8 +254,9 @@
 &emsp;&emsp;在本次疫情封锁焦虑抑郁影响与预测研究中，本课题对相关临床心理学问卷数据进行特征浓缩提取并对PHQ-ADS总分进行标签划分，再对其他学习问卷进行特征提取与清洗。通过尝试使用决策树、KNN、SVM、随机森林与Xgboost等机器学习算法对数据进行模型拟合并初步调优，我们最终确认采纳了性能较好可塑性强的集成学习算法Xgboost。对其深度调参后，模型性能远比决策树和KNN优异，也略好于SVM和同为集成学习算法的随机森林。最终的Xgboost参数组合于下表中展示。<br>
 
 > 表 5  Xgboost最终参数
+
 |parameter|value|parameter|value|
-|:---:|:---:|:---:|:---:|
+|:----:|:----:|:----:|:----:|
 |learning_rate|0.1|num_class|3|
 |eval_metric|mlogloss|max_depth|2|
 |subsample|0.5|colsample_bytree|0.95|
