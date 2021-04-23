@@ -225,6 +225,7 @@
 
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb1.png)
 > 图 11 Xgboost参数n_estimators与模型F1_micro得分的关系
+
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb2.png)
 > 图 12 用Xgboost模型F1_micro得分筛选参数组(min_child_weight,max_depth)
 
