@@ -24,8 +24,10 @@
   * [3.5 Xboost](#35-Xboost)
   * [3.6 特征重要性](#36-特征重要性)
 - [4 总结与展望](#4-总结与展望)
+- [参考文献](#参考文献)
 - [附录](#附录)
-
+  * [附录A PHQ-ADS问卷](#附录A-PHQ-ADS问卷)
+  * [附录B 疫情困难调查问卷](#附录B-疫情困难调查问卷)
 
 
 # 1 引言
@@ -277,10 +279,66 @@
 &emsp;&emsp;最终的模型能够使分类得分控制在0.763左右。由于模型的标签预测分类恒定落于3类标签之内，因此F1_micro得分将与准确度差别不大，即分类的正确率大于0.76。又因为Xgboost的灵活配置与高度可塑，我们还能对自定义模型的目标函数和评估函数，只要求函数二阶可导即可，这提供了全新的可操作维度。<br>
 &emsp;&emsp;纵观全文，本文认为可以进一步提高模型的分类效能，其中最重要的数据质量与规模，它是一切建模的基础，搜集更多数量特征更加多元更接地气的数据能够更容易有针对性地对该心理健康问题进行建模。其次，在建模之前将调查的量表数据进行因子分析，对题目的特征进行筛选和因子旋转并通过特征重要性舍弃部分贡献较低的特征，从而提升模型的分析质量。考虑到现实中患有焦虑抑郁的人数与患病程度成反比，相应的数据标签也会因此而不平衡，进入影响到分类器的评价指标，解决方案是对标签比例大的数据进行欠采样和比例小的进行过采样来平衡标签比例，亦或者尽可能扩大数据的采集规模从根本上解决该问题。<br>
 
+# 参考文献
+[1]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington, D.C.: American Psychiatric Pub, 2013.189-195.
+[2]	Craske MG, Stein MB. Anxiety[J]. Lancet. 2016;388(10063):3048-3059.
+[3]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington DC: American Psychiatric Pub, 2013.160-168.
+[4]	Sullivan, Patrick F., Michael C. Neale, and Kenneth S. Kendler. Genetic epidemiology of major depression: review and meta-analysis[J]. American Journal of Psychiatry, 2000, 157(10):1552-1562.
+[5]	Blier, Pierre, and Mostafa El Mansari. Serotonin and beyond: therapeutics for major depression[J]. Philosophical Transactions of the Royal Society B: Biological Sciences, 2013, 368(1615): 20120536.
+[6]	Kroenke, Kurt, Fitsum Baye, and Spencer G. Lourens. Comparative validity and responsiveness of PHQ-ADS and other composite anxiety-depression measures[J]. Journal of affective disorders, 2019, 246: 437-443.
+[7]	Gambin, Małgorzata, et al. Generalized anxiety and depressive symptoms in various age groups during the COVID-19 lockdown in Poland. Specific predictors and differences in symptoms severity[J]. Comprehensive Psychiatry, 2021, 105: 152222.
+[8]	Cortes, Corinna, and Vladimir Vapnik. Support-vector networks[J]. Machine learning, 1995, 20(3): 273-297.
+[9]	Ho, Tin Kam. Random decision forests[A]. Proceedings of 3rd international conference on document analysis and recognition. Vol. 1[C]. NJ: IEEE, 1995.
+[10]	Breiman L. Random forests[J]. Machine Learning, 2001, 45(1): 5-32.
+[11]	Chen, Tianqi, and Carlos Guestrin. Xgboost: A scalable tree boosting system[A]. Balaji Krishnapuram, Mohak Shah. Proceedings of the 22nd acm sigkdd international conference on knowledge discovery and data mining[C]. NY: Association for Computing Machinery,2016. 785-794.
+
 # 附录
+## 附录A PHQ-ADS问卷
+&emsp;&emsp;PHQ-ADS问卷包含PHQ-9问卷和GAD-7问卷，以下是问卷完整问题内容：<br>
+> 表 6 PHQ-9(病人健康状况问卷-9)
 
+|No.|Questions(Over 2 weeks)|Score|
+|:---:|:---|:---:|
+|1|做任何事都觉得沉闷或者根本不想做任何事|&nbsp;&nbsp;|
+|2|情绪低落、忧郁或绝望|&nbsp;|
+|3|难于入睡、半夜会醒，或相反，睡觉时间过多|&nbsp;|
+|4|觉得疲倦或没有精力|&nbsp;|
+|5|胃口不好或饮食过量|&nbsp;|
+|6|觉得自己做得不好、对自己失望或有负家人期望|&nbsp;|
+|7|难于集中精神做事，例如看报纸或看电视|&nbsp;|
+|8|其它人可能会注意到您在动或说话的时候比平时慢； 或者相反，您坐立不安，比起平时有多余的身体动作|&nbsp;|
+|9|想到自己不如死了算了，或者有自残的念头|&nbsp;|
 
+> 表 7 GAD-7(广泛性焦虑量表-7)
 
+|No.|Questions(Over 2 weeks)|Score|
+|:---:|:---|:---:|
+|1|感觉紧张、焦虑或不安|&nbsp;|
+|2|无法停止或控制担忧|&nbsp;|
+|3|对各种事情担心太多|&nbsp;|
+|4|难以放松|&nbsp;|
+|5|坐立不安，以至于很难安静地坐下来|&nbsp;|
+|6|变得容易生气或急躁|&nbsp;|
+|7|感觉害怕，好像有可怕的事情要发生一样|&nbsp;|
 
+## 附录B 疫情困难调查问卷
+> 表 8 疫情困难调查问卷
 
-
+|No.|Questions(Over 2 weeks)|Score|
+|:---:|:---|:---:|
+|1|家庭的人际关系不融洽(感觉应当顺从指令，争吵等)|&nbsp;|
+|2|无法独处(没有他人陪伴)|&nbsp;|
+|3|日常工作增加|&nbsp;|
+|4|孤独感，有被抛弃的感觉。|&nbsp;|
+|5|在限制措施中感到无所适从（例如：对能否做某件事感到彷徨）|&nbsp;|
+|6|不能与心爱的人或朋友见面|&nbsp;|
+|7|不能与一般人见面|&nbsp;|
+|8|无聊、单调的生活|&nbsp;|
+|9|行动和旅行的限制|&nbsp;|
+|10|在公共场所需要戴口罩|&nbsp;|
+|11|由于新的规定，购物方式发生了变化（例如，减少了商店的人数，需要在网上购物）|&nbsp;|
+|12|觉得自己自由受到限制（如自作决定）|&nbsp;|
+|13|生活方式需要改变|&nbsp;|
+|14|与病毒传播有关的危机感和焦虑|&nbsp;|
+|15|形势的不确定性和不可预测性|&nbsp;|
+|16|对疫情的整体情况感到厌倦|&nbsp;|
