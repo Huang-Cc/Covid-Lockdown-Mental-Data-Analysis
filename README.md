@@ -280,17 +280,17 @@
 &emsp;&emsp;纵观全文，本文认为可以进一步提高模型的分类效能，其中最重要的数据质量与规模，它是一切建模的基础，搜集更多数量特征更加多元更接地气的数据能够更容易有针对性地对该心理健康问题进行建模。其次，在建模之前将调查的量表数据进行因子分析，对题目的特征进行筛选和因子旋转并通过特征重要性舍弃部分贡献较低的特征，从而提升模型的分析质量。考虑到现实中患有焦虑抑郁的人数与患病程度成反比，相应的数据标签也会因此而不平衡，进入影响到分类器的评价指标，解决方案是对标签比例大的数据进行欠采样和比例小的进行过采样来平衡标签比例，亦或者尽可能扩大数据的采集规模从根本上解决该问题。<br>
 
 # 参考文献
-[1]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington, D.C.: American Psychiatric Pub, 2013.189-195.
-[2]	Craske MG, Stein MB. Anxiety[J]. Lancet. 2016;388(10063):3048-3059.
-[3]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington DC: American Psychiatric Pub, 2013.160-168.
-[4]	Sullivan, Patrick F., Michael C. Neale, and Kenneth S. Kendler. Genetic epidemiology of major depression: review and meta-analysis[J]. American Journal of Psychiatry, 2000, 157(10):1552-1562.
-[5]	Blier, Pierre, and Mostafa El Mansari. Serotonin and beyond: therapeutics for major depression[J]. Philosophical Transactions of the Royal Society B: Biological Sciences, 2013, 368(1615): 20120536.
-[6]	Kroenke, Kurt, Fitsum Baye, and Spencer G. Lourens. Comparative validity and responsiveness of PHQ-ADS and other composite anxiety-depression measures[J]. Journal of affective disorders, 2019, 246: 437-443.
-[7]	Gambin, Małgorzata, et al. Generalized anxiety and depressive symptoms in various age groups during the COVID-19 lockdown in Poland. Specific predictors and differences in symptoms severity[J]. Comprehensive Psychiatry, 2021, 105: 152222.
-[8]	Cortes, Corinna, and Vladimir Vapnik. Support-vector networks[J]. Machine learning, 1995, 20(3): 273-297.
-[9]	Ho, Tin Kam. Random decision forests[A]. Proceedings of 3rd international conference on document analysis and recognition. Vol. 1[C]. NJ: IEEE, 1995.
-[10]	Breiman L. Random forests[J]. Machine Learning, 2001, 45(1): 5-32.
-[11]	Chen, Tianqi, and Carlos Guestrin. Xgboost: A scalable tree boosting system[A]. Balaji Krishnapuram, Mohak Shah. Proceedings of the 22nd acm sigkdd international conference on knowledge discovery and data mining[C]. NY: Association for Computing Machinery,2016. 785-794.
+[1]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington, D.C.: American Psychiatric Pub, 2013.189-195.<br>
+[2]	Craske MG, Stein MB. Anxiety[J]. Lancet. 2016;388(10063):3048-3059.<br>
+[3]	American Psychiatric Association. Diagnostic and statistical manual of mental disorders (DSM-5®)[M]. Washington DC: American Psychiatric Pub, 2013.160-168.<br>
+[4]	Sullivan, Patrick F., Michael C. Neale, and Kenneth S. Kendler. Genetic epidemiology of major depression: review and meta-analysis[J]. American Journal of Psychiatry, 2000, 157(10):1552-1562.<br>
+[5]	Blier, Pierre, and Mostafa El Mansari. Serotonin and beyond: therapeutics for major depression[J]. Philosophical Transactions of the Royal Society B: Biological Sciences, 2013, 368(1615): 20120536.<br>
+[6]	Kroenke, Kurt, Fitsum Baye, and Spencer G. Lourens. Comparative validity and responsiveness of PHQ-ADS and other composite anxiety-depression measures[J]. Journal of affective disorders, 2019, 246: 437-443.<br>
+[7]	Gambin, Małgorzata, et al. Generalized anxiety and depressive symptoms in various age groups during the COVID-19 lockdown in Poland. Specific predictors and differences in symptoms severity[J]. Comprehensive Psychiatry, 2021, 105: 152222.<br>
+[8]	Cortes, Corinna, and Vladimir Vapnik. Support-vector networks[J]. Machine learning, 1995, 20(3): 273-297.<br>
+[9]	Ho, Tin Kam. Random decision forests[A]. Proceedings of 3rd international conference on document analysis and recognition. Vol. 1[C]. NJ: IEEE, 1995.<br>
+[10]	Breiman L. Random forests[J]. Machine Learning, 2001, 45(1): 5-32.<br>
+[11]	Chen, Tianqi, and Carlos Guestrin. Xgboost: A scalable tree boosting system[A]. Balaji Krishnapuram, Mohak Shah. Proceedings of the 22nd acm sigkdd international conference on knowledge discovery and data mining[C]. NY: Association for Computing Machinery,2016. 785-794.<br>
 
 # 附录
 ## 附录A PHQ-ADS问卷
