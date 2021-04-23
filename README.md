@@ -1,3 +1,4 @@
+
 # Covid-Lockdown-Mental-Data-Analysis
 # 疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别
 
@@ -124,12 +125,147 @@
 &emsp;&emsp;从图 1可以看到，除决策树外，其余四类算法的F1_micro得分都大于0.7,其中得分最高的是随机森林为0.72836，SVM次之，但这四个分类器得分差距不大(<0.03)。鉴于上述对比仅是初步计算得分，建模时未对参数进行交叉验证，所以只表现的是模型性能的大致轮廓。<br>
 &emsp;&emsp;下面将从决策树开始逐步对五种分类器进行初步调整，若得分有明显提升再对应进行颗粒度更小的参数搜索，并进行更深层的精细化调优。本实验将调用sklearn包modelselection类中的GridSearchCV函数对训练集数据进行10折交叉验证和参数网格搜索，以获得使得F1得分最高的参数组合。以下说明的模型参数均与sklearn包各模型算法一致。<br>
 
+## 3.1	决策树
+&emsp;&emsp;决策树算法的主要参数有特征选取方法criterion、树的最大深度max_depth、节点再划分最小样本数min_samples_split、叶子节点最小样本数min_samples_leaf等。其中criterion可以选择gini(基尼不纯度)和entropy(信息增益)。本课题在该参数上选用的是基尼不纯度，其计算方法如下公式(1)，criterion=gini对应的决策树算法为CART算法。<br>
 
+![image](https://latex.codecogs.com/svg.image?I_%7Bg%7D(p)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D%5Csum_%7Bk%5Cneq%20i%7Dp_%7Bk%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D(1-p_%7Bi%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D-p_%7Bi%7D%5E2)=1-%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D%5E2)   (1)
 
+&emsp;&emsp;其中J为类别个数，i∈{1,2,…,J}，p_i为第i类标签在数据集中的占比。<br>
+&emsp;&emsp;另外对该算法设置了参数max_features=sqrt，对变量min_samples_split, max_depth进行1网格搜索，搜索范围为2-30和1-20，步长均为1。<br>
 
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/dt.png)
+> 图 2 通过决策树F1_micro得分筛选超参数组合(min_samples_split, max_depth)
 
+&emsp;&emsp;通过对超参数组合(min_samples_split, max_depth)进行网格搜索，得到的最优组合为(2,2)，对应的训练集和测试集的F1_micro得分差距甚微，可以认为模型拟合充分，但该得分也只是仅仅与默认参数的随机森林齐平。鉴于后续研究中有性能更为优异的模型，故不对该决策树进行更深入的调参。<br>
 
+## 3.2	KNN
+&emsp;&emsp;K近邻算法(K-Nearest Neighbors algorithm)是一种用于分类和回归的非参数统计方法，该算法依赖于距离进行分类。其超参数为近邻数n_neighbor、近邻计算算法algorithm、权重函数weight等。在建模时，KNN算法默认的近邻数为5，现对其进行网格搜索，范围为\[\1,100)，观察模型得分是否有提升。搜索前，分类模型算法algorithm已设置为auto，即自动选择最优的近邻算法，其余超参数均为算法默认值。<br>
 
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/knn.png)
+> 图 3 通过F1_micro得分筛选超参数n_neighbor
+
+&emsp;&emsp;从图 3中可以看到，在参数n_neighbor不断增大的过程中，模型从欠拟合迅速提升到拟合状态，从曲线峰值往后模型得分便缓慢下滑至0.72上下波动，网格搜索出的最佳近邻个数为14，训练集得分为0.75385，测试集得分为0.73134，相较于图 1最初模型得分有所上升，略高于决策树。在更新超参数n_neighbor=14后尝试将参数weights由默认的uniform改为distance，给邻居的贡献增加权重，以便较近的邻居比较远的邻居对平均值的贡献更大。从得分结果来看，模型测试集得分没有提升。接着固定权重为distance不变，遍历超参数p得到图 4模型得分曲线。 <br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/knn3.png)
+> 图 4 超参数p网格搜索过程
+
+&emsp;&emsp;这一步的网格搜索结果为p=2，测试集得分与weights使用uniform时相同，训练集得分略微降低，最终的模型为加权14NN分类器。但对比其他机器学习算法，KNN算法在该数据集下的性能则稍显平庸。<br>
+
+## 3.3	SVM
+&emsp;&emsp;支持向量机(support vector machine，简称为SVM)是一种用于分类和回归分析的监督式学习模型与相关算法，由AT＆T贝尔实验室的Vladimir Vapnik及其同事开发[8]。SVM将训练样本映射到空间中的某个点，在高维或无限维空间中构建一个超平面或一组超平面，并最大程度地扩大两个类别之间的距离，然后将新样本映射到相同的空间，并根据它们落在空间的哪一侧来预测其属于哪一个类别，除此之外SVM巧妙地使用核方法来高效地执行非线性分类，将其输入隐式映射到高维特征空间。SVM算法一般用于分类、回归或异常值检测等任务。<br>
+&emsp;&emsp;支持向量机的超参数随核函数的变化而相应不同，常用的有线性核函数Linear，对应超参数为C；高斯核函数rbf，对应超参数C和gamma；多项式核函数poly，对应超参数为C、gamma和degree；以及Sigmoid核函数，常用超参数与rbf相同。<br>
+&emsp;&emsp;按SVM分类器建模常用流程，先选择合适的核函数，再调整对应超参数。对kernel参数备选组(poly,rbf,linear,sigmoid)进行10折网格搜索，其中性能最好的核函数为多项式核函数poly，默认参数下测试集F1_micro得分为0.7403，其分类效果明显优于决策树，也好于上述KNN算法。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svn2.png)
+> 图 5 多项式核SVM分类器参数C选择过程
+
+&emsp;&emsp;对超参数C在\[\1,100)步长为1的范围进行搜索验证，当C=1(即默认值)时模型得分最优，模型测试集得分为0.7403，与第一步结果相同，接着搜索超参数degree的取值。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/svn3.png)
+> 图 6 多项式核SVM分类器参数degree选择过程
+
+&emsp;&emsp;从图 6可以看到，在degree=3时模型F1_score得分出现峰值，输入测试集得到测试得分为0.7403，与第一步模型得分相同，原因是超参数degree的默认值为3。<br>
+&emsp;&emsp;通过上述三步参数选择，得到了研究至此暂时性能最优的分类模型，接下来看看采用集成学习算法的随机森林和Xgboost对比SVM性能是否有差距。<br>
+
+## 3.4	随机森林
+&emsp;&emsp;随机森林(random forest)一种用于分类、回归和聚类的集成学习算法，它包含多个决策树的分类结果，并且将子树输出的类别众数作为输出。随机森林纠正了决策树对其训练集过度拟合的问题，所以其表现通常优于决策树，但准确性低于梯度提升树。TK. Ho于1995年提出了随机决策森林这一概念[9]，而后Leo Breiman提出了更加合理的随机森林算法[10]。他介绍了一种使用类似于CART过程，结合随机节点优化和bagging来构建不相关树森林的方法，这种bagging方法在不增加偏差的情况下降低了方差，从而带来了更好的性能。此外他还创新地在构建森林时使用袋外误差来代替泛化误差，并提出可以通过随机森林来对变量的重要性进行排序。<br>
+&emsp;&emsp;随机森林拥有决策树中所有超参数，用于控制每棵树的生成和剪枝，以及相应的集成框架参数如：n_estimators分类器数目、oob_score是否使用out-of-bagging数据计算袋外误差来评估模型、criterion树的特征评价标准等。随机森林算法超参数众多，一次性对所有参数进行网格搜索需要大量的计算时间，也不现实，因此采用贪心的边缘搜索方法获得局部最优的参数组合，以下是参数选择过程。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/rf.png)
+> 图 7 随机森林分类器数目n_estimators与模型F1_micro得分的关系
+
+&emsp;&emsp;在固定算法所有其他参数为默认值的情况下，n_estimators在\[\1,300)的范围内进行搜索验证。从图 7可以看到当分类器数目逐步增加到78时，模型得分达到最大为0.73974.继续往后增加树的棵数，模型得分趋于平稳，没有明显上升的趋势。根据奥卡姆剃刀原理，n_estimators取78为最佳的森林数目，此时的测试集得分为0.72239。接下来组合搜索超参数min_samples_split和max_depth，范围分布是\[\2,30)和\[\1,20)步长均为1。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/rf2.png)
+> 图 8 不同参数组(min_samples_split,max_depth)对模型交叉验证分数的影响
+
+&emsp;&emsp;输出的最优组合为max_depth=11,min_samples_split=20,此次参数选择使得随机森林的训练集得分提升到了0.75385，而测试集得分则是上升到了0.73731,较第一步有明显的性能增强。而参数min_samples_leaf与min_samples_split有一定关系，所有下面对参数组(min_samples_leaf,min_samples_split)，进行筛选与调整。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/rf3.png)
+> 图 9 不同参数组(min_samples_leaf,min_samples_split)对模型交叉验证分数的影响
+
+&emsp;&emsp;筛选出的最优参数组为(min_samples_leaf=1,min_samples_split=20)，因为数值1本身就是min_samples_leaf的默认参数，所以训练集与测试集分数没有发生改变。最后再尝试调整超参数max_features，看能否进一步改进模型。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/rf4.png)
+> 图 10 随机森林参数max_features与模型F1_micro得分的关系
+
+&emsp;&emsp;GridSearchCV最终选择选择了max_features=3，模型得分依旧没有发生改变，原因是前面建模是选择的max_features=auto，算法会根据经验默认为其填充特征数开方的取整值，即<br>
+
+![image](https://latex.codecogs.com/svg.image?int(%5Csqrt%5B2%5D%7Bn%5C_%7B%7Dfeature%7D)=int(%5Csqrt%5B2%5D%7B14%7D)=3) (2)
+
+&emsp;&emsp;至此，本研究建立了一个性能较为优异的随机森林，最后再来看看Xgboost的表现。<br>
+
+## 3.5	Xgboost
+&emsp;&emsp;Xgboost是陈天奇等人开发一个可扩展的梯度提升树系统[11]，它高效地实现了GBDT算法并对相应的算法和程序运行作出了许多改进，能够使用非常少的运算资源来快速准确地解决现实世界中各种规模的数据问题。Xgboost的超参数众多，能够应对各种数据的不规则性，有着无与伦比的可塑性，其高度复杂的算法亦有非凡出色的性能。它采用后剪枝的方法，先训练一颗完整的树，再从外向内剪枝，这样不容易陷入局部最优。<br>
+&emsp;&emsp;Xgboost提供了三种参数用于模型设置：通用参数、Booster参数和学习目标参数。其中通用参数一般使用默认即可。Booster包含TreeBooster和LinearBooster。其中TreeBooster中的参数与决策树类似，通常要设置的有学习率learning_rate，与损失函数有关的gamma，树的最大深度max_depth，子节点最小样本权重min_child_weight，建树样本比例subsample，建树时特征采样比例colsample_bytree。LinearBooster的主要参数则为reg_lambda和reg_alpha。除此之外最重要的是学习目标参数，本课题属于多分类任务，所以将目标参数设置为multi:softmax，此外还需添加num_class=3;eval_metric=mlogloss。下面是具体的调参过程。<br>
+&emsp;&emsp;和随机森林一样，模型的超参数过多，不能确保组合起来遍历搜索，所以采用相同的贪心算法来分组网格交叉验证调参。表 4为初始模型参数。<br>
+
+> 表 4 Xgboost初步建模输入默认参数
+|parameter|value|
+|:---:|:---:|
+|learning_rate|0.1|
+|subsample|1|
+|max_depth|6|
+|gamma|0|
+|colsample_bytree|1|
+|min_child_weight|1|
+
+&emsp;&emsp;本次建模将首先从n_estimators开始，寻找最佳的迭代次数。<br>
+&emsp;&emsp;由图 11可以发现模型得分先是快速上升到一个极点，而后下降至波动平稳。极值点的n_estimators为33，测试集得分为0.6985，似乎得分并不是特别理想，接下来调整进一步超参数组合min_child_weight和max_depth，观察其对应模型得分变化。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb.png)
+> 图 11 Xgboost参数n_estimators与模型F1_micro得分的关系
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb2.png)
+> 图 12 用Xgboost模型F1_micro得分筛选参数组(min_child_weight,max_depth)
+
+&emsp;&emsp;由3Dsurface 图 12可以看到随着两个参数的不断增大，模型得分呈现下滑趋势，筛选器给出的极值点最佳参数组为(min_child_weight=2,max_depth=2)，其相应训练集预测得分为0.73461538，而测试集预测得分为0.73731343，相对于步骤1来说模型性能提升明显。下一步我们再尝试调整损失参数gamma。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb3.png)
+> 图 13 Xgboost参数gamma与模型F1_micro得分的关系
+
+&emsp;&emsp;固定前述两步得到的最佳超参数组合，对参数gamma进行调整。从上图可以看到，超参数gamma的得分曲线相对曲折，先后出现了5个极点，达到0.73846的得分，随后便迅速下降至0.727附近来回波动。为简便计算，取第一个极值点作为最佳gamma参数，其值为0.16，对应测试集得分为0.7403，性能已经基本与SVM的持平。Xgboost的众多可调整参数给予其更强的挖掘潜力，下面再尝试调整采样比例参数，适当降低基分类器间的相关性，看Xgboost是否会有更出色的表现。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb4.png)
+> 图 14 用Xgboost模型F1_micro得分筛选参数组(subsample,colsample_bytree)
+
+&emsp;&emsp;以0.05的颗粒度对参数组(subsample,colsample_bytree)进行网格搜索，取值区间为\[\0.5,1\]\。图 14可以清晰地看到顶点的得分值超过了0.75，参数搜索结果为(subsample=0.5,colsample_bytree=0.95)，测试集得分更是达到了0.76418，说明增加基分类器的多样性后模型的性能有了显著的提升。<br>
+&emsp;&emsp;另外Xgboost在代价函数中加入了正则项用于控制集成模型的复杂度，也降低了模型方差，防止过拟合。下面将尝试调整正则化参数(reg_alpha,reg_lambda)。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb5.png)
+> 图 15 用Xgboost模型F1_micro得分筛选参数组(reg_alpha,reg_lambda)
+
+&emsp;&emsp;微平均F1得分峰值出现在坐标(reg_alpha,reg_lambda)=(0.65,0.7)处，对应的训练集得分为0.76026，测试集得分为0.75522。对比上一轮调参，测试集的分数略微降低，但从两集得分的差距来看，模型的拟合是更加充分的。<br>
+&emsp;&emsp;最后的一步，我们来重新搜索一遍学习率参数，进一步将其颗粒度缩小，在[0.001,3]的范围内搜索最佳学习率。<br>
+&emsp;&emsp;图 16的曲线已经相对明晰了，最初设置的学习率0.1就是使模型效能最好的值，因而得分并没有发生改变。用最终的模型对数据全集作预测，得到的F1_micro分数为0.76323，远远优于前述的所有建模算法。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb6.png)
+> 图 16 学习率learning_rate与模型F1_micro得分的关系
+
+## 3.6	特征重要性
+&emsp;&emsp;由于Xgboost是基于树模型的集成学习算法，能够自发地在学习过程中进行特征选择，从而精简了部分数据预处理操作。并且，它与其他树类算法一样能够在学习的过程中计算的特征重要性。<br>
+
+![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/img.png)
+> 图 17  Xgboost特征重要性可视化
+
+&emsp;&emsp;图 17绘制了Xgboost模型中每个特征对分类的贡献程度。贡献最大的前五名依次是Social_Restrictions、Protection_and_Life_Change、Worry_and_Fear、Unemployed和AgeGroup，可见疫情期间不同年龄组、社交隔离、失业风险和生活剧变等对民众心理健康有显著影响。<br>
+
+# 4	总结与展望
+&emsp;&emsp;在本次疫情封锁焦虑抑郁影响与预测研究中，本课题对相关临床心理学问卷数据进行特征浓缩提取并对PHQ-ADS总分进行标签划分，再对其他学习问卷进行特征提取与清洗。通过尝试使用决策树、KNN、SVM、随机森林与Xgboost等机器学习算法对数据进行模型拟合并初步调优，我们最终确认采纳了性能较好可塑性强的集成学习算法Xgboost。对其深度调参后，模型性能远比决策树和KNN优异，也略好于SVM和同为集成学习算法的随机森林。最终的Xgboost参数组合于下表中展示。<br>
+
+> 表 5  Xgboost最终参数
+|parameter|value|parameter|value|
+|:---:|:---:|:---:|:---:|
+|learning_rate|0.1|num_class|3|
+|eval_metric|mlogloss|max_depth|2|
+|subsample|0.5|colsample_bytree|0.95|
+|min_child_weight|2|n_estimators|33|
+|gamma|0.16|reg_alpha|0.65|
+|objective|multi:softmax|reg_lambda|0.7|
+
+&emsp;&emsp;最终的模型能够使分类得分控制在0.763左右。由于模型的标签预测分类恒定落于3类标签之内，因此F1_micro得分将与准确度差别不大，即分类的正确率大于0.76。又因为Xgboost的灵活配置与高度可塑，我们还能对自定义模型的目标函数和评估函数，只要求函数二阶可导即可，这提供了全新的可操作维度。<br>
+&emsp;&emsp;纵观全文，本文认为可以进一步提高模型的分类效能，其中最重要的数据质量与规模，它是一切建模的基础，搜集更多数量特征更加多元更接地气的数据能够更容易有针对性地对该心理健康问题进行建模。其次，在建模之前将调查的量表数据进行因子分析，对题目的特征进行筛选和因子旋转并通过特征重要性舍弃部分贡献较低的特征，从而提升模型的分析质量。考虑到现实中患有焦虑抑郁的人数与患病程度成反比，相应的数据标签也会因此而不平衡，进入影响到分类器的评价指标，解决方案是对标签比例大的数据进行欠采样和比例小的进行过采样来平衡标签比例，亦或者尽可能扩大数据的采集规模从根本上解决该问题。<br>
+
+# 附录
 
 
 
