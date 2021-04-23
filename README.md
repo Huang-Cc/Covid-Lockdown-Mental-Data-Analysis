@@ -2,7 +2,7 @@
 # Covid-Lockdown-Mental-Data-Analysis
 # 疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别
 
-### 施工中(50%)
+### 施工中(95%)
 - [Covid-Lockdown-Mental-Data-Analysis](#covid-lockdown-mental-data-analysis)
 - [疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别](#疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别)
 - [1 引言](#1-引言)
@@ -17,6 +17,15 @@
   * [2.2 数据缺失值处理](#22-数据缺失值处理)
   * [2.3 提取特征指标](#23-提取特征指标)
 - [3 模型构建与调优](#3-模型构建与调优)
+  * [3.1 决策树](#31-决策树)
+  * [3.2 KNN](#32-KNN)
+  * [3.3 SVM](#33-SVM)
+  * [3.4 随机森林](#34-随机森林)
+  * [3.5 Xboost](#35-Xboost)
+  * [3.6 特征重要性](#36-特征重要性)
+- [4 总结与展望](#4-总结与展望)
+- [附录](#附录)
+
 
 
 # 1 引言
@@ -125,7 +134,7 @@
 &emsp;&emsp;从图 1可以看到，除决策树外，其余四类算法的F1_micro得分都大于0.7,其中得分最高的是随机森林为0.72836，SVM次之，但这四个分类器得分差距不大(<0.03)。鉴于上述对比仅是初步计算得分，建模时未对参数进行交叉验证，所以只表现的是模型性能的大致轮廓。<br>
 &emsp;&emsp;下面将从决策树开始逐步对五种分类器进行初步调整，若得分有明显提升再对应进行颗粒度更小的参数搜索，并进行更深层的精细化调优。本实验将调用sklearn包modelselection类中的GridSearchCV函数对训练集数据进行10折交叉验证和参数网格搜索，以获得使得F1得分最高的参数组合。以下说明的模型参数均与sklearn包各模型算法一致。<br>
 
-## 3.1	决策树
+## 3.1 决策树
 &emsp;&emsp;决策树算法的主要参数有特征选取方法criterion、树的最大深度max_depth、节点再划分最小样本数min_samples_split、叶子节点最小样本数min_samples_leaf等。其中criterion可以选择gini(基尼不纯度)和entropy(信息增益)。本课题在该参数上选用的是基尼不纯度，其计算方法如下公式(1)，criterion=gini对应的决策树算法为CART算法。<br>
 
 ![image](https://latex.codecogs.com/svg.image?I_%7Bg%7D(p)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D%5Csum_%7Bk%5Cneq%20i%7Dp_%7Bk%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D(1-p_%7Bi%7D)=%5Csum_%7Bi=1%7D%5E%7BJ%7D(p_%7Bi%7D-p_%7Bi%7D%5E2)=1-%5Csum_%7Bi=1%7D%5E%7BJ%7Dp_%7Bi%7D%5E2)   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;(1)
@@ -138,7 +147,7 @@
 
 &emsp;&emsp;通过对超参数组合(min_samples_split, max_depth)进行网格搜索，得到的最优组合为(2,2)，对应的训练集和测试集的F1_micro得分差距甚微，可以认为模型拟合充分，但该得分也只是仅仅与默认参数的随机森林齐平。鉴于后续研究中有性能更为优异的模型，故不对该决策树进行更深入的调参。<br>
 
-## 3.2	KNN
+## 3.2 KNN
 &emsp;&emsp;K近邻算法(K-Nearest Neighbors algorithm)是一种用于分类和回归的非参数统计方法，该算法依赖于距离进行分类。其超参数为近邻数n_neighbor、近邻计算算法algorithm、权重函数weight等。在建模时，KNN算法默认的近邻数为5，现对其进行网格搜索，范围为\[\1,100)，观察模型得分是否有提升。搜索前，分类模型算法algorithm已设置为auto，即自动选择最优的近邻算法，其余超参数均为算法默认值。<br>
 
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/knn.png)
@@ -151,7 +160,7 @@
 
 &emsp;&emsp;这一步的网格搜索结果为p=2，测试集得分与weights使用uniform时相同，训练集得分略微降低，最终的模型为加权14NN分类器。但对比其他机器学习算法，KNN算法在该数据集下的性能则稍显平庸。<br>
 
-## 3.3	SVM
+## 3.3 SVM
 &emsp;&emsp;支持向量机(support vector machine，简称为SVM)是一种用于分类和回归分析的监督式学习模型与相关算法，由AT＆T贝尔实验室的Vladimir Vapnik及其同事开发[8]。SVM将训练样本映射到空间中的某个点，在高维或无限维空间中构建一个超平面或一组超平面，并最大程度地扩大两个类别之间的距离，然后将新样本映射到相同的空间，并根据它们落在空间的哪一侧来预测其属于哪一个类别，除此之外SVM巧妙地使用核方法来高效地执行非线性分类，将其输入隐式映射到高维特征空间。SVM算法一般用于分类、回归或异常值检测等任务。<br>
 &emsp;&emsp;支持向量机的超参数随核函数的变化而相应不同，常用的有线性核函数Linear，对应超参数为C；高斯核函数rbf，对应超参数C和gamma；多项式核函数poly，对应超参数为C、gamma和degree；以及Sigmoid核函数，常用超参数与rbf相同。<br>
 &emsp;&emsp;按SVM分类器建模常用流程，先选择合适的核函数，再调整对应超参数。对kernel参数备选组(poly,rbf,linear,sigmoid)进行10折网格搜索，其中性能最好的核函数为多项式核函数poly，默认参数下测试集F1_micro得分为0.7403，其分类效果明显优于决策树，也好于上述KNN算法。<br>
@@ -167,7 +176,7 @@
 &emsp;&emsp;从图 6可以看到，在degree=3时模型F1_score得分出现峰值，输入测试集得到测试得分为0.7403，与第一步模型得分相同，原因是超参数degree的默认值为3。<br>
 &emsp;&emsp;通过上述三步参数选择，得到了研究至此暂时性能最优的分类模型，接下来看看采用集成学习算法的随机森林和Xgboost对比SVM性能是否有差距。<br>
 
-## 3.4	随机森林
+## 3.4 随机森林
 &emsp;&emsp;随机森林(random forest)一种用于分类、回归和聚类的集成学习算法，它包含多个决策树的分类结果，并且将子树输出的类别众数作为输出。随机森林纠正了决策树对其训练集过度拟合的问题，所以其表现通常优于决策树，但准确性低于梯度提升树。TK. Ho于1995年提出了随机决策森林这一概念[9]，而后Leo Breiman提出了更加合理的随机森林算法[10]。他介绍了一种使用类似于CART过程，结合随机节点优化和bagging来构建不相关树森林的方法，这种bagging方法在不增加偏差的情况下降低了方差，从而带来了更好的性能。此外他还创新地在构建森林时使用袋外误差来代替泛化误差，并提出可以通过随机森林来对变量的重要性进行排序。<br>
 &emsp;&emsp;随机森林拥有决策树中所有超参数，用于控制每棵树的生成和剪枝，以及相应的集成框架参数如：n_estimators分类器数目、oob_score是否使用out-of-bagging数据计算袋外误差来评估模型、criterion树的特征评价标准等。随机森林算法超参数众多，一次性对所有参数进行网格搜索需要大量的计算时间，也不现实，因此采用贪心的边缘搜索方法获得局部最优的参数组合，以下是参数选择过程。<br>
 
@@ -195,7 +204,7 @@
 
 &emsp;&emsp;至此，本研究建立了一个性能较为优异的随机森林，最后再来看看Xgboost的表现。<br>
 
-## 3.5	Xgboost
+## 3.5 Xgboost
 &emsp;&emsp;Xgboost是陈天奇等人开发一个可扩展的梯度提升树系统[11]，它高效地实现了GBDT算法并对相应的算法和程序运行作出了许多改进，能够使用非常少的运算资源来快速准确地解决现实世界中各种规模的数据问题。Xgboost的超参数众多，能够应对各种数据的不规则性，有着无与伦比的可塑性，其高度复杂的算法亦有非凡出色的性能。它采用后剪枝的方法，先训练一颗完整的树，再从外向内剪枝，这样不容易陷入局部最优。<br>
 &emsp;&emsp;Xgboost提供了三种参数用于模型设置：通用参数、Booster参数和学习目标参数。其中通用参数一般使用默认即可。Booster包含TreeBooster和LinearBooster。其中TreeBooster中的参数与决策树类似，通常要设置的有学习率learning_rate，与损失函数有关的gamma，树的最大深度max_depth，子节点最小样本权重min_child_weight，建树样本比例subsample，建树时特征采样比例colsample_bytree。LinearBooster的主要参数则为reg_lambda和reg_alpha。除此之外最重要的是学习目标参数，本课题属于多分类任务，所以将目标参数设置为multi:softmax，此外还需添加num_class=3;eval_metric=mlogloss。下面是具体的调参过程。<br>
 &emsp;&emsp;和随机森林一样，模型的超参数过多，不能确保组合起来遍历搜索，所以采用相同的贪心算法来分组网格交叉验证调参。表 4为初始模型参数。<br>
@@ -242,7 +251,7 @@
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/xgb6.png)
 > 图 16 学习率learning_rate与模型F1_micro得分的关系
 
-## 3.6	特征重要性
+## 3.6 特征重要性
 &emsp;&emsp;由于Xgboost是基于树模型的集成学习算法，能够自发地在学习过程中进行特征选择，从而精简了部分数据预处理操作。并且，它与其他树类算法一样能够在学习的过程中计算的特征重要性。<br>
 
 ![image](https://github.com/Huang-Cc/Covid-Lockdown-Mental-Data-Analysis/blob/main/Images/imp.png)
@@ -250,7 +259,7 @@
 
 &emsp;&emsp;图 17绘制了Xgboost模型中每个特征对分类的贡献程度。贡献最大的前五名依次是Social_Restrictions、Protection_and_Life_Change、Worry_and_Fear、Unemployed和AgeGroup，可见疫情期间不同年龄组、社交隔离、失业风险和生活剧变等对民众心理健康有显著影响。<br>
 
-# 4	总结与展望
+# 4 总结与展望
 &emsp;&emsp;在本次疫情封锁焦虑抑郁影响与预测研究中，本课题对相关临床心理学问卷数据进行特征浓缩提取并对PHQ-ADS总分进行标签划分，再对其他学习问卷进行特征提取与清洗。通过尝试使用决策树、KNN、SVM、随机森林与Xgboost等机器学习算法对数据进行模型拟合并初步调优，我们最终确认采纳了性能较好可塑性强的集成学习算法Xgboost。对其深度调参后，模型性能远比决策树和KNN优异，也略好于SVM和同为集成学习算法的随机森林。最终的Xgboost参数组合于下表中展示。<br>
 
 > 表 5  Xgboost最终参数
