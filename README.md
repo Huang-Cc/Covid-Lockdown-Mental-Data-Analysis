@@ -1,10 +1,7 @@
 
-# Covid-Lockdown-Mental-Data-Analysis
-# 疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别
-# Transky Hwang in 2021.4.23
+# 疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别(Covid-Lockdown-Mental-Data-Analysis)
+Transky Hwang in 2021.4.23
 
-- [Covid-Lockdown-Mental-Data-Analysis](#covid-lockdown-mental-data-analysis)
-- [疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别](#疫情封锁对各年龄段人群焦虑抑郁症状的影响与预测识别)
 - [1 引言](#1-引言)
   * [1.1 研究背景及意义](#11-研究背景及意义)
   * [1.2 国内外发展状况](#12-国内外发展状况)
